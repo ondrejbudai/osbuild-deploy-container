@@ -177,6 +177,7 @@ func manifestFromCobra(cmd *cobra.Command, args []string) ([]byte, *mTLSConfig, 
 	targetArch, _ := cmd.Flags().GetString("target-arch")
 	tlsVerify, _ := cmd.Flags().GetBool("tls-verify")
 	localStorage, _ := cmd.Flags().GetBool("local")
+	rootSize, _ := cmd.Flags().GetString("root-size")
 
 	if targetArch != "" && arch.FromString(targetArch) != arch.Current() {
 		// TODO: detect if binfmt_misc for target arch is
@@ -223,12 +224,23 @@ func manifestFromCobra(cmd *cobra.Command, args []string) ([]byte, *mTLSConfig, 
 		logrus.Debug("Using local container")
 	}
 
-	cntSize, err := getContainerSize(imgref)
-	if err != nil {
-		return nil, nil, fmt.Errorf("cannot get container size: %w", err)
+	var rootSizeBytes uint64
+	if rootSize != "" {
+		rootSizeBytes, err = DataSizeToUint64(rootSize)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cannot parse --root-size: %w", err)
+		}
+	} else {
+		rootSizeBytes, err = getContainerSize(imgref)
+		if err != nil {
+			return nil, nil, fmt.Errorf("cannot get container size: %w", err)
+		}
+
+		rootSizeBytes *= containerSizeToDiskSizeMultiplier
 	}
+
 	filesystems := []blueprint.FilesystemCustomization{
-		{Mountpoint: "/", MinSize: cntSize * containerSizeToDiskSizeMultiplier},
+		{Mountpoint: "/", MinSize: rootSizeBytes},
 	}
 	container, err := podman_container.New(imgref)
 	if err != nil {
@@ -543,6 +555,7 @@ func run() error {
 	manifestCmd.Flags().String("config", "", "build config file; /config.json will be used if present")
 	manifestCmd.Flags().String("rpmmd", "/rpmmd", "rpm metadata cache directory")
 	manifestCmd.Flags().String("target-arch", "", "build for the given target architecture (experimental)")
+	manifestCmd.Flags().String("root-size", "", "size of the root partition (supports units like 'MB', 'GiB', etc.), default is 2x the container size, or 10GiB (whichever is larger)")
 	manifestCmd.Flags().StringArray("type", []string{"qcow2"}, fmt.Sprintf("image types to build [%s]", allImageTypesString()))
 	manifestCmd.Flags().Bool("local", false, "use a local container rather than a container from a registry")
 

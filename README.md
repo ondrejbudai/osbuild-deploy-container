@@ -141,13 +141,14 @@ Flags:
 
 ### Detailed description of optional flags
 
-| Argument          | Description                                                         | Default Value |
-|-------------------|---------------------------------------------------------------------|:-------------:|
-| **--chown**       | chown the ouput directory to match the specified UID:GID            |       ❌      |
-| **--config**      | Path to a [build config](#-build-config)                            |       ❌      |
-| **--tls-verify**  | Require HTTPS and verify certificates when contacting registries    |    `true`     |
-| **--type**        | [Image type](#-image-types) to build                                |    `qcow2`    |
-| **--target-arch** | [Target arch](#-target-architecture) to build                       |       ❌      |
+| Argument          | Description                                                         | Default Value                                         |
+|-------------------|---------------------------------------------------------------------|:-----------------------------------------------------:|
+| **--chown**       | chown the ouput directory to match the specified UID:GID            |       ❌                                              |
+| **--config**      | Path to a [build config](#-build-config)                            |       ❌                                              |
+| **--tls-verify**  | Require HTTPS and verify certificates when contacting registries    |    `true`                                             |
+| **--type**        | [Image type](#-image-types) to build                                |    `qcow2`                                            |
+| **--root-size**   | size of the root partition (supports units like 'MB', 'GiB', etc.)  | 2x the container size, or 10GiB (whichever is larger) |
+| **--target-arch** | [Target arch](#-target-architecture) to build                       |       ❌                                              |
 
 The `--type` parameter can be given multiple times and multiple outputs will
 be produced.
