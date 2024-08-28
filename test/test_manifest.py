@@ -84,7 +84,7 @@ def test_manifest_disksize(tmp_path, build_container, tc):
             *testutil.podman_run_common,
             "--entrypoint", "/usr/bin/bootc-image-builder",
             build_container,
-            "manifest", "--local",
+            "manifest",
             *tc.bib_rootfs_args(),
             f"localhost/{container_tag}",
         ], encoding="utf8")
@@ -104,7 +104,7 @@ def test_manifest_local_checks_containers_storage_errors(build_container):
         "--security-opt", "label=type:unconfined_t",
         "--entrypoint=/usr/bin/bootc-image-builder",
         build_container,
-        "manifest", "--local", "arg-not-used",
+        "manifest", "arg-not-used",
     ], check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, encoding="utf8")
     assert res.returncode == 1
     err = 'local storage not working, did you forget -v /var/lib/containers/storage:/var/lib/containers/storage?'
@@ -144,7 +144,7 @@ def test_manifest_cross_arch_check(tmp_path, build_container):
                 "--entrypoint=/usr/bin/bootc-image-builder",
                 build_container,
                 "manifest", "--target-arch=aarch64",
-                "--local", f"localhost/{container_tag}"
+                f"localhost/{container_tag}"
             ], check=True, capture_output=True, encoding="utf8")
         assert 'image found is for unexpected architecture "x86_64"' in exc.value.stderr
 

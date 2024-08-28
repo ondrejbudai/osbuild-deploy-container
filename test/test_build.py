@@ -59,20 +59,20 @@ def image_type_fixture(shared_tmpdir, build_container, request, force_aws_upload
     In the case an image is being built from a local container, the
     function will build the required local container for the test.
     """
-    container_ref = request.param.container_ref
+    # container_ref = request.param.container_ref
 
-    if request.param.local:
-        cont_tag = "localhost/cont-base-" + "".join(random.choices(string.digits, k=12))
+    # if request.param.local:
+    #     cont_tag = "localhost/cont-base-" + "".join(random.choices(string.digits, k=12))
 
-        # we are not cross-building local images (for now)
-        request.param.target_arch = ""
+    #     # we are not cross-building local images (for now)
+    #     request.param.target_arch = ""
 
-        # copy the container into containers-storage
-        subprocess.check_call([
-            "skopeo", "copy",
-            f"docker://{container_ref}",
-            f"containers-storage:[overlay@/var/lib/containers/storage+/run/containers/storage]{cont_tag}"
-        ])
+    #     # copy the container into containers-storage
+    #     subprocess.check_call([
+    #         "skopeo", "copy",
+    #         f"docker://{container_ref}",
+    #         f"containers-storage:[overlay@/var/lib/containers/storage+/run/containers/storage]{cont_tag}"
+    #     ])
 
     with build_images(shared_tmpdir, build_container, request, force_aws_upload) as build_results:
         yield build_results[0]
@@ -266,7 +266,6 @@ def build_images(shared_tmpdir, build_container, request, force_aws_upload):
             *upload_args,
             *target_arch_args,
             *tc.bib_rootfs_args(),
-            "--local" if tc.local else "--local=false",
         ])
 
         # print the build command for easier tracing
